@@ -8,7 +8,7 @@ export const useAuth = () => {
   
     const { data: authUser } = useQuery({
       queryKey: ["authUser"],
-      queryFn: () =>
+      queryFn: () => 
         new Promise((resolve) => {
           const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             console.log(currentUser);
