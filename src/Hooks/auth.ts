@@ -1,28 +1,24 @@
-import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { useQuery } from "@tanstack/react-query";
-import { auth } from "../Firebase/firebase";
 
-export const useAuth = () => {
-    const [user, setUser] = useState(null);
-  
-    const { data: authUser } = useQuery({
-      queryKey: ["authUser"],
-      queryFn: () => 
-        new Promise((resolve) => {
-          const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            console.log(currentUser);
-            setUser(currentUser);
-            resolve(currentUser);
-            unsubscribe();
-          });
-        }),
-      staleTime: Infinity,
-      cacheTime: Infinity,
-      initialData: JSON.parse(localStorage.getItem('user')) || null,
-    });
-    return authUser;
-  };
+  import { onAuthStateChanged,User } from "firebase/auth";
+  import { useQuery } from "@tanstack/react-query";
+  import { auth } from "../Firebase/firebase";
+
+  export const useAuth = () => {
+    
+      const { data: authUser } = useQuery<User | null>({
+        queryKey: ["authUser"],
+        queryFn: () => 
+          new Promise((resolve) => {
+            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+              resolve(currentUser);
+              unsubscribe();
+            });
+          }),
+        staleTime: Infinity,
+        initialData: JSON.parse(localStorage.getItem("user") || "null"),
+      });
+      return authUser;
+    };
 
 
 //   export default useAuth

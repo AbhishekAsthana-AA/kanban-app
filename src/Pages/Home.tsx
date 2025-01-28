@@ -9,9 +9,6 @@ import {
 } from "@material-tailwind/react";
 import AccordionComponent from "../Components/UserInterface/Accordian";
 import Board from "../Components/UserInterface/Board";
-import { Card, Typography } from "@material-tailwind/react";
-import type { TabProps } from "@material-tailwind/react";
-import type { TabsHeaderProps } from "@material-tailwind/react";
 import AddEditTask from "../Components/UserInterface/AddEditTask";
 
 export default function Home() {
@@ -45,7 +42,7 @@ export default function Home() {
               className:
                 "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
             }}
-          >
+            {...(undefined as any)} >
             {data.map(({ label, value, icon }) => (
               <Tab
                 key={value}
@@ -54,7 +51,7 @@ export default function Home() {
                 className={
                   activeTab === value ? "text-black-900" : "text-gray-500"
                 }
-              >
+                {...(undefined as any)} >
                 {/* <img src="../src/assets/view-board.png"  />     {label} */}
                 {/* <img src="../src/assets/view-board.png" /> {label} */}
                 <i className={icon} aria-hidden="true"></i> {label}
@@ -63,7 +60,7 @@ export default function Home() {
             ))}
           </TabsHeader>
 
-          <TabsBody>
+          <TabsBody {...(undefined as any)}>
             {data.map(({ value, desc }) => (
               <TabPanel key={value} value={value}>
 
@@ -74,7 +71,8 @@ export default function Home() {
                   <Button variant="gradient"
                     onClick={toggleModal}
                     className="rounded-full border"
-                    color="purple">
+                    color="purple"
+                    {...(undefined as any)}>
                     <span>Add Task</span>
                   </Button>
                 </div>

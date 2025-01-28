@@ -4,22 +4,25 @@
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Input, Typography, Select, Option, Button} from "@material-tailwind/react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { taskCategories } from "../../Utils/data";
-import { auth, googleProvider,db } from "../../Firebase/firebase";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+// import { auth, googleProvider,db } from "../../Firebase/firebase";
+// import { getFirestore, doc, setDoc } from "firebase/firestore";
+// import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const categories = ["Work", "Personal"];
 
-export default function AddEditTask({ open, handleToggle }) {
-    const [taskDescription, setTaskDescription] = useState("");
-    const [selectedDate, setSelectedDate] = useState(null);
+interface Props {
+    open: any;
+    handleToggle: () => any;
+  }
+export default function AddEditTask({ open, handleToggle }:Props) {
+
     const [imagePreview, setImagePreview] = useState(null);
 
     const validationSchema = Yup.object().shape({
@@ -37,10 +40,10 @@ export default function AddEditTask({ open, handleToggle }) {
         resolver: yupResolver(validationSchema),
     });
 
-    const handleFileChange = (event) => {
+    const handleFileChange = (event:any) => {
         const file = event.target.files[0];
         if (file) {
-            const reader = new FileReader();
+            const reader:any = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result);
             };
@@ -48,11 +51,11 @@ export default function AddEditTask({ open, handleToggle }) {
         }
     };
 
-    const handleDragOver = (event) => {
+    const handleDragOver = (event:any) => {
         event.preventDefault();
     };
 
-    const handleDrop = (event) => {
+    const handleDrop = (event:any) => {
         event.preventDefault();
         const file = event.dataTransfer.files[0];
         if (file) {
@@ -60,29 +63,26 @@ export default function AddEditTask({ open, handleToggle }) {
         }
     };
 
-    const displayImagePreview = (file) => {
-        const reader = new FileReader();
+    const displayImagePreview = (file:any) => {
+        const reader:any = new FileReader();
         reader.onloadend = () => {
             setImagePreview(reader.result);
         };
         reader.readAsDataURL(file);
     };
 
-    const handleDateChange = (date) => {
-        setSelectedDate(date);
-        console.log(date);
-    };
 
-    const onSubmit = (data) => {
+
+    const onSubmit = (data:any) => {
         alert('d')
         console.log(data);
     };
 
     return (
-        <Dialog open={open} size="md" handler={handleToggle}>
-            <DialogHeader>Create Task</DialogHeader>
+        <Dialog open={open} size="md" handler={handleToggle}    {...(undefined as any)}>
+            <DialogHeader    {...(undefined as any)}>Create Task</DialogHeader>
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-                <DialogBody className="overflow-y-auto max-h-[400px]">
+                <DialogBody className="overflow-y-auto max-h-[400px]"    {...(undefined as any)}>
 
                     <div>
                         <Controller
@@ -93,7 +93,7 @@ export default function AddEditTask({ open, handleToggle }) {
                                     {...field}
                                     size="sm"
                                     label="Task Title"
-
+                                    {...(undefined as any)}
                                 />
                             )}
                         />
@@ -120,7 +120,7 @@ export default function AddEditTask({ open, handleToggle }) {
                     <div className="grid grid-cols-1 md:grid-cols-3 mb-4 mt-10 py-2">
 
                         <div className="col-span-1">
-                            <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2">
+                            <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2"    {...(undefined as any)}>
                                 Task Category
                             </Typography>
                             <div className="flex gap-2 mt">
@@ -147,7 +147,7 @@ export default function AddEditTask({ open, handleToggle }) {
                         </div>
 
                         <div className="col-span-1">
-                            <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2">
+                            <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2"    {...(undefined as any)}>
                                 Due On
                             </Typography>
                             <Controller
@@ -161,6 +161,7 @@ export default function AddEditTask({ open, handleToggle }) {
                                         dateFormat="dd-MM-yyyy"
                                         className="border border-gray-300 rounded-md p-2 w-full text-base"
                                         placeholderText="Select Date"
+                                        {...(undefined as any)}
                                     />
                                 )}
                             />
@@ -168,7 +169,7 @@ export default function AddEditTask({ open, handleToggle }) {
                         </div>
 
                         <div className="col-span-1">
-                            <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2">
+                            <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2"    {...(undefined as any)}>
                                 Task Status
                             </Typography>
                             <Controller
@@ -180,7 +181,7 @@ export default function AddEditTask({ open, handleToggle }) {
                                         size="md"
                                         label="Task Status"
                                         error={!!errors.taskStatus}
-                                    >
+                                        {...(undefined as any)} >
                                         {
                                             taskCategories.map((categories:any) => (
                                                 <Option value={categories.id}>{categories.name}</Option>
@@ -195,7 +196,7 @@ export default function AddEditTask({ open, handleToggle }) {
 
                     {/* Upload File */}
                     <div className="w-full">
-                        <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2">
+                        <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2" {...(undefined as any)}>
                             Attachment
                         </Typography>
                         <label
@@ -248,12 +249,13 @@ export default function AddEditTask({ open, handleToggle }) {
                     </div>
 
                 </DialogBody>
-                <DialogFooter>
+                <DialogFooter    {...(undefined as any)}>
                     <Button
                         variant="text"
                         color="red"
                         onClick={handleToggle}
                         className="mr-1 rounded-full border bg-gray-200"
+                        {...(undefined as any)}
                     >
                         Cancel
                     </Button>
@@ -262,6 +264,7 @@ export default function AddEditTask({ open, handleToggle }) {
                         className="rounded-full border"
                         color="purple"
                         type="submit"
+                        {...(undefined as any)}
                     >
                         Create
                     </Button>
