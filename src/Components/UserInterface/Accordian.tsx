@@ -71,8 +71,10 @@ export default function AccordionComponent() {
     return (
         <>
             {/* Todo Accordion */}
-            <Accordion open={open[0]} className="mb-2 rounded-lg border border-blue-gray-100">
-                <AccordionHeader onClick={() => handleOpen(0)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#fac3ff" }}>
+            <Accordion open={open[0]} className="mb-2 rounded-lg border border-blue-gray-100"
+              {...(undefined as any)}>
+                <AccordionHeader onClick={() => handleOpen(0)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#fac3ff" }}
+                       {...(undefined as any)}>
                     Todo ({tasks.filter(task => task.status === "TO_DO").length})
                 </AccordionHeader>
                 <AccordionBody className="pt-4 py-0 text-base font-normal">
@@ -81,8 +83,10 @@ export default function AccordionComponent() {
             </Accordion>
 
             {/* In-Progress Accordion */}
-            <Accordion open={open[1]} className="mb-2 rounded-lg border border-blue-gray-100">
-                <AccordionHeader onClick={() => handleOpen(1)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#85d9f1" }}>
+            <Accordion open={open[1]} className="mb-2 rounded-lg border border-blue-gray-100"
+               {...(undefined as any)}>
+                <AccordionHeader onClick={() => handleOpen(1)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#85d9f1" }}
+                       {...(undefined as any)}>
                     In-Progress ({tasks.filter(task => task.status === "IN_PROGRESS").length})
                 </AccordionHeader>
                 <AccordionBody className="pt-4 py-0 text-base font-normal">
@@ -91,8 +95,10 @@ export default function AccordionComponent() {
             </Accordion>
 
             {/* Completed Accordion */}
-            <Accordion open={open[2]} className="rounded-lg border border-blue-gray-100">
-                <AccordionHeader onClick={() => handleOpen(2)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#ceffcc" }}>
+            <Accordion open={open[2]} className="rounded-lg border border-blue-gray-100" 
+            {...(undefined as any)}>
+                <AccordionHeader onClick={() => handleOpen(2)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#ceffcc" }}
+                    {...(undefined as any)}>
                     Completed ({tasks.filter(task => task.status === "COMPLETED").length})
                 </AccordionHeader>
                 <AccordionBody className="pt-4 py-0 text-base font-normal">
