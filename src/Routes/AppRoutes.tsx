@@ -4,16 +4,12 @@ import Login from "../Pages/Login";
 import Home from "../Pages/Home";
 import { useAuth } from "../Hooks/auth";
 
-
-// const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-//   const user = useAuth();
-//   console.log(user);
-//   return user != null ? children : <Navigate to="/" />
-// };
-
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const  user  = useAuth(); // Destructure user from useAuth
-  console.log(user);
+  if (user === undefined) {
+    // Optionally show a loading spinner or placeholder here
+    return <div>Loading...</div>;
+  }
   return user ? children : <Navigate to="/" replace />;
 };
 
