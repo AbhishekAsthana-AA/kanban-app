@@ -4,35 +4,6 @@ import {
     AccordionHeader,
     AccordionBody,
 } from "@material-tailwind/react";
-import {
-    Menu,
-    MenuHandler,
-    MenuList,
-    MenuItem,
-    Button,
-    Dialog,
-    DialogHeader,
-    DialogBody,
-    DialogFooter,
-    Card,
-    CardHeader,
-    CardBody,
-    Input,
-    Typography,
-    Tabs,
-    TabsHeader,
-    TabsBody,
-    Tab,
-    TabPanel,
-    Select,
-    Option,
-    Radio,
-    ButtonGroup
-} from "@material-tailwind/react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import { taskCategories } from "../../Utils/data";
-
 
 export default function AccordionComponent() {
     const [open, setOpen] = React.useState([true, true, true]);
