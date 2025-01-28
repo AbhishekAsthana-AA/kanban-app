@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import MainLayout from "../Layouts/MainLayout";
 import Login from "../Pages/Login";
 import Home from "../Pages/Home";
-import { useEffect, useState } from "react";
 import { useAuth } from "../Hooks/auth";
 
 

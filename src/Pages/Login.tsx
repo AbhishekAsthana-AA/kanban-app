@@ -2,8 +2,8 @@
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider,db } from "../Firebase/firebase";
 import { useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { doc, setDoc } from "firebase/firestore";
 
 
 export default function Login() {
@@ -12,7 +12,7 @@ export default function Login() {
     const loginMutation = useMutation({
         mutationFn: async () => {
             const result = await signInWithPopup(auth, googleProvider);
-            const user = result.user as User;
+            // const user = result.user as User;
             return result.user;
         },
         onSuccess: async (user) => {
@@ -54,9 +54,10 @@ export default function Login() {
             <button
                 onClick={handleLogin}
                 className="bg-blue-600 text-white px-4 py-2 rounded"
-                disabled={loginMutation.isLoading}
+                // disabled={loginMutation.isLoading}
             >
-                {loginMutation.isLoading ? "Signing in..." : "Sign in with Google"}
+                Sign in with Google
+                {/* {loginMutation.isLoading ? "Signing in..." : "Sign in with Google"} */}
             </button>
         </div>
     );

@@ -1,32 +1,26 @@
-import React from "react";
+// import React from "react";
 
 // @material-tailwind-react
 import {
     Card,
-    Avatar,
-    Button,
     CardBody,
     Typography,
 } from "@material-tailwind/react";
 
 
-const imgs = [
-    "https://www.material-tailwind.com/image/web3-card-1.svg",
-    "https://www.material-tailwind.com/image/web3-card-2.svg",
-    "https://www.material-tailwind.com/image/web3-card-3.svg",
-];
 export default function Board() {
 
 
 
     return (<>
         <div className="grid grid-cols-3 gap-2">
-            <Card>
-                <CardBody className="p-4 max-h-96 overflow-y-auto">
+            <Card    {...(undefined as any)}>
+                <CardBody className="p-4 max-h-96 overflow-y-auto"    {...(undefined as any)}>
                 <Typography
                         color="blue-gray"
                         className="mb-1 !text-base !font-semibold  text-black p-1 rounded-md w-32 text-center"
                         style={{ backgroundColor: "#fac3ff" }}
+                        {...(undefined as any)}
                     >
                         To Do
                     </Typography>
@@ -49,12 +43,12 @@ export default function Board() {
                 </CardBody>
             </Card>
 
-            <Card>
-                <CardBody className="p-4 max-h-96 overflow-y-auto">
+            <Card    {...(undefined as any)}>
+                <CardBody className="p-4 max-h-96 overflow-y-auto"    {...(undefined as any)}>
                 <Typography
                         color="blue-gray"
                         className="mb-1 !text-base !font-semibold p-1 text-black rounded-md w-32 text-center"
-                        style={{ backgroundColor: "#85d9f1" }}
+                        style={{ backgroundColor: "#85d9f1" }}    {...(undefined as any)}
                     >
                         In-Progress
                     </Typography>
@@ -77,12 +71,12 @@ export default function Board() {
                 </CardBody>
             </Card>
 
-            <Card>
-                <CardBody className="p-4 max-h-96 overflow-y-auto">
+            <Card    {...(undefined as any)}>
+                <CardBody className="p-4 max-h-96 overflow-y-auto"    {...(undefined as any)}>
                     <Typography
                         color="blue-gray"
                         className="mb-1 !text-base !font-semibold p-1 text-black rounded-md w-32 text-center"
-                        style={{ backgroundColor: "#ceffcc" }}
+                        style={{ backgroundColor: "#ceffcc" }}    {...(undefined as any)}
                     >
                         Completed
                     </Typography>
