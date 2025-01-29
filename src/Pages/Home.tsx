@@ -1,4 +1,4 @@
-import React from "react";
+
 import {
   Tabs,
   TabsHeader,
@@ -10,18 +10,113 @@ import {
 import AccordionComponent from "../Components/UserInterface/Accordian";
 import Board from "../Components/UserInterface/Board";
 import AddEditTask from "../Components/UserInterface/AddEditTask";
+import { auth, db } from "../Firebase/firebase";
+import { doc, setDoc, serverTimestamp, collection, getDocs, query, where, orderBy, updateDoc } from "firebase/firestore";
+import { toast } from 'react-toastify';
+import { useState, useEffect } from "react";
+import { taskCategories } from "../Utils/data";
+import { Select, Option, Typography, Input } from "@material-tailwind/react"
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { startAt, endAt } from "firebase/firestore";
+
+interface Task {
+  id: string;
+  taskStatus: string;
+  taskTitle: string;
+  timeStamp: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  uid: string;
+  description: string;
+}
 
 export default function Home() {
-  const [activeTab, setActiveTab] = React.useState("list");
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [activeTab, setActiveTab] = useState("list");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [payload, setPayload] = useState({
+    taskStatus:'',
+    taskTitle:''
+  });
+
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [payload])
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+  const fetchDocuments = async () => {
+    try {
+      const taskDataRef = collection(db, "taskdata");
+
+      let filters: any[] = [];
+      if (payload.taskStatus) {
+        filters.push(where("taskStatus", "==", payload.taskStatus));
+      }
+      if (payload.taskTitle) {
+        filters.push(orderBy('taskTitle'));
+        filters.push(startAt(payload.taskTitle));
+        filters.push(endAt(payload.taskTitle + '\uf8ff'));
+      }
+
+      let q;
+      if (filters.length > 0) {
+        q = query(taskDataRef, ...filters);
+      } else {
+        q = taskDataRef;
+      }
+      const querySnapshot = await getDocs(q);
+      const data:any = querySnapshot.docs.map((doc) => {
+        const docData = doc.data();
+        return {
+          id: doc.id,
+          ...docData,
+          date: new Date(docData.dueDate.seconds * 1000).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+        };
+      });
+
+      // console.log(data);
+      setTasks(data);
+      toast.success('Data Fetch Successfully');
+    } catch (error:any) {
+      toast.error(error.message || "Error fetching tasks");
+    }
+  };
+
+  const handleFilterChange = (fieldName: any, value: any) => {
+    setPayload((prev) => ({
+      ...prev,
+      [fieldName]: value,
+    }));
+    // fetchDocuments();
+
+  };
+
+  //status Change
+  const handleStatusChange = async (newStatus: any, taskId: number) => {
+    // const newStatus = e.target.value;
+    try {
+      const taskDocRef = doc(db, "taskdata", taskId.toString());
+      await updateDoc(taskDocRef, { taskStatus: newStatus });
+      fetchDocuments();
+      // console.log(`Task ${taskId} updated to status: ${newStatus}`);
+    } catch (error) {
+      console.error("Error updating task status:", error);
+    }
+  };
+
   const data = [
     {
       label: "List",
       value: "list",
       icon: 'fa fa-list',
-      desc: <AccordionComponent />,
+      desc: <AccordionComponent tasks={tasks} updateStatus={handleStatusChange} />,
     },
     {
       label: " Board",
@@ -30,6 +125,29 @@ export default function Home() {
       desc: <Board />
     },
   ];
+
+  //save task
+  const handleSaveTask = async (data: any) => {
+
+    const res: any = await auth.currentUser
+    try {
+      const id = Date.now().toString()
+      await setDoc(doc(db, 'taskdata', id), {
+        ...data,
+        id: id,
+        uid: res.uid,
+        timeStamp: serverTimestamp(),
+      })
+      toggleModal();
+      fetchDocuments();
+      toast.success('Data Save Successfully');
+      return true;
+    } catch (error: any) {
+      toast.error(error);
+      console.log(error);
+      return false;
+    }
+  };
 
 
   return (
@@ -52,8 +170,6 @@ export default function Home() {
                   activeTab === value ? "text-black-900" : "text-gray-500"
                 }
                 {...(undefined as any)} >
-                {/* <img src="../src/assets/view-board.png"  />     {label} */}
-                {/* <img src="../src/assets/view-board.png" /> {label} */}
                 <i className={icon} aria-hidden="true"></i> {label}
 
               </Tab>
@@ -66,16 +182,56 @@ export default function Home() {
 
                 {/* Flter By */}
 
-                <div className="py-4">
-                  
-                  <Button variant="gradient"
-                    onClick={toggleModal}
-                    className="rounded-full border"
-                    color="purple"
-                    {...(undefined as any)}>
-                    <span>Add Task</span>
-                  </Button>
+
+
+                <div className="py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Typography variant="paragraph" color="blue-gray" className="font-medium w-48"
+                      {...(undefined as any)}>
+                      Filter by:
+                    </Typography>
+
+                    <Select size="md" label="Category" className="overflow-hidden"
+                      onChange={(value) => {
+                        handleFilterChange("taskStatus", value);
+                      }}
+                      {...(undefined as any)}>
+                      {taskCategories.map((category: any) => (
+                        <Option key={category.id} value={category.id} className="truncate">
+                          {category.name}
+                        </Option>
+                      ))}
+                    </Select>
+
+                    <Select size="md" label="Due Date" className=" overflow-hidden"      {...(undefined as any)}>
+                      <Option value="asc">Oldest First</Option>
+                      <Option value="desc">Newest First</Option>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <Input type="text" placeholder="Search" className="w-52 pl-10 rounded-full"
+                        onChange={(e) => {
+                          handleFilterChange("taskTitle", e.target.value);
+                        }}
+                        {...(undefined as any)} />
+                      <MagnifyingGlassIcon className="w-5 h-5 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                    </div>
+
+                    <Button      {...(undefined as any)}
+                      variant="gradient"
+                      onClick={toggleModal}
+                      className="rounded-full"
+                      color="purple"
+                    >
+                      ADD TASK
+                    </Button>
+                  </div>
                 </div>
+
+
+
 
                 {/* Header */}
                 {value === "list" ? (
@@ -92,6 +248,7 @@ export default function Home() {
 
 
 
+
                 {/* Accordian */}
                 {desc}
               </TabPanel>
@@ -99,8 +256,11 @@ export default function Home() {
           </TabsBody>
         </Tabs>
 
-        <AddEditTask open={isModalOpen} handleToggle={toggleModal} />
+        <AddEditTask open={isModalOpen} handleToggle={toggleModal}
+          onSave={handleSaveTask} />
       </div>
+      {/* <ToastContainer 
+      /> */}
     </>
   );
 }

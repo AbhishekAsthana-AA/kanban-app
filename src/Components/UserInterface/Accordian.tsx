@@ -4,27 +4,22 @@ import {
     AccordionHeader,
     AccordionBody,
 } from "@material-tailwind/react";
+import { ToastContainer } from 'react-toastify';
 
-export default function AccordionComponent() {
+interface Props {
+    tasks: any;
+    updateStatus: (newStatus: string,taskId:number) => any;
+}
+
+export default function AccordionComponent({tasks,updateStatus}: Props) {
     const [open, setOpen] = React.useState([true, true, true]);
-    const [tasks, setTasks] = React.useState([
-        { id: 1, title: "Interview With Design High High High High", status: "TO_DO" },
-        { id: 2, title: "Design Meeting", status: "IN_PROGRESS" },
-        { id: 3, title: "Final Review", status: "COMPLETED" },
-        { id: 4, title: "Interview With Design High", status: "TO_DO" },
-    ]);
 
-
-    const handleStatusChange = (e: any, taskId: number) => {
+    
+    const handleStatusDataChange = async (e: any, taskId: number) => {
         const newStatus = e.target.value;
-        const updatedTasks = tasks.map((task) => {
-            if (task.id === taskId) {
-                task.status = newStatus;
-            }
-            return task;
-        });
-        setTasks(updatedTasks);
+        await updateStatus(newStatus,taskId)
     };
+
 
     const handleOpen = (index: number) => {
         const newOpen = [...open];
@@ -33,23 +28,24 @@ export default function AccordionComponent() {
     };
 
     const renderTasksByStatus = (status: string) => {
+        // console.log(tasks);
         return tasks
-            .filter((task) => task.status === status)
-            .map((task) => (
+            .filter((task:any) => task.taskStatus === status)
+            .map((task:any) => (
                 <ul key={task.id} className="border-b flex  items-center justify-between gap-4 rounded-lg pb-3 text-black-900 p-2">
                     <li className="flex  items-center w-96">
                         <input type="checkbox" id={`task-${task.id}`} className="mr-2" />
-                        <span className="md:text-left ms:truncate">{task.title}</span>
+                        <span className="md:text-left ms:truncate">{task.taskTitle}</span>
                     </li>
                     <li className="md:text-left truncate hidden md:grid w-80">
-                        <span >Due On</span>
+                        <span >{task.date}</span>
                     </li>
                     <li className="md:text-left truncate hidden md:grid w-80">
-                        
+
                         <select
                             className="border p-1 rounded"
-                            onChange={(e) => handleStatusChange(e, task.id)}
-                            value={task.status}
+                            onChange={(e) => handleStatusDataChange(e, task.id)}
+                            value={task.taskStatus}
                         >
                             <option value="TO_DO">To-Do</option>
                             <option value="IN_PROGRESS">In-Progress</option>
@@ -72,10 +68,10 @@ export default function AccordionComponent() {
         <>
             {/* Todo Accordion */}
             <Accordion open={open[0]} className="mb-2 rounded-lg border border-blue-gray-100"
-              {...(undefined as any)}>
+                {...(undefined as any)}>
                 <AccordionHeader onClick={() => handleOpen(0)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#fac3ff" }}
-                       {...(undefined as any)}>
-                    Todo ({tasks.filter(task => task.status === "TO_DO").length})
+                    {...(undefined as any)}>
+                    Todo ({tasks.filter((task:any ) => task.taskStatus === "TO_DO").length})
                 </AccordionHeader>
                 <AccordionBody className="pt-4 py-0 text-base font-normal">
                     {renderTasksByStatus("TO_DO")}
@@ -84,10 +80,10 @@ export default function AccordionComponent() {
 
             {/* In-Progress Accordion */}
             <Accordion open={open[1]} className="mb-2 rounded-lg border border-blue-gray-100"
-               {...(undefined as any)}>
+                {...(undefined as any)}>
                 <AccordionHeader onClick={() => handleOpen(1)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#85d9f1" }}
-                       {...(undefined as any)}>
-                    In-Progress ({tasks.filter(task => task.status === "IN_PROGRESS").length})
+                    {...(undefined as any)}>
+                    In-Progress ({tasks.filter((task:any )=> task.taskStatus === "IN_PROGRESS").length})
                 </AccordionHeader>
                 <AccordionBody className="pt-4 py-0 text-base font-normal">
                     {renderTasksByStatus("IN_PROGRESS")}
@@ -95,18 +91,18 @@ export default function AccordionComponent() {
             </Accordion>
 
             {/* Completed Accordion */}
-            <Accordion open={open[2]} className="rounded-lg border border-blue-gray-100" 
-            {...(undefined as any)}>
+            <Accordion open={open[2]} className="rounded-lg border border-blue-gray-100"
+                {...(undefined as any)}>
                 <AccordionHeader onClick={() => handleOpen(2)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#ceffcc" }}
                     {...(undefined as any)}>
-                    Completed ({tasks.filter(task => task.status === "COMPLETED").length})
+                    Completed ({tasks.filter((task:any ) => task.taskStatus === "COMPLETED").length})
                 </AccordionHeader>
                 <AccordionBody className="pt-4 py-0 text-base font-normal">
                     {renderTasksByStatus("COMPLETED")}
                 </AccordionBody>
             </Accordion>
 
-
+            <ToastContainer />
 
         </>
     );
