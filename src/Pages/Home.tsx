@@ -41,7 +41,7 @@ export default function Home() {
     taskStatus:'',
     taskTitle:''
   });
-  const  user  = useAuth();
+  const  user:any  = useAuth();
 
 
   useEffect(() => {

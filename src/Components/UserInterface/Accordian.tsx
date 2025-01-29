@@ -10,13 +10,13 @@ interface Props {
     tasks: any;
     updateStatus: (newStatus: string, taskId: number) => any;
     onEdit:(id:any)=>any;
-    ondelete:(id:number)=>any;
+    ondelete:(id:any)=>any;
 
 }
 
-export default function AccordionComponent({ tasks, updateStatus,onEdit,ondelete }: Props) {
+export default function AccordionComponent({ tasks, updateStatus,onEdit, ondelete }: Props) {
     const [open, setOpen] = React.useState([true, true, true]);
-    const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+    // const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
 
     const handleStatusDataChange = async (e: any, taskId: number) => {
@@ -24,9 +24,9 @@ export default function AccordionComponent({ tasks, updateStatus,onEdit,ondelete
         await updateStatus(newStatus, taskId)
     };
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-      };
+    // const toggleDropdown = () => {
+    //     setIsDropdownOpen(!isDropdownOpen);
+    //   };
 
       const handleEdit = (id:number) => {
         onEdit(id)
