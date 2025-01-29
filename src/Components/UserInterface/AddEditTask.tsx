@@ -11,6 +11,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { taskCategories } from "../../Utils/data";
+import { useEffect } from "react";
 
 
 
@@ -20,14 +21,13 @@ interface Props {
     open: any;
     handleToggle: () => any;
     onSave: (data: any) => any;
+    resetEdit: () => any;
+    taskEditData: any
 }
-export default function AddEditTask({ open, handleToggle, onSave }: Props) {
+export default function AddEditTask({ open, handleToggle, onSave, taskEditData, resetEdit }: Props) {
 
     const [imagePreview, setImagePreview] = useState(null);
     const [taskData, setTaskData] = useState({});
-
-
-
 
     // Validation Shema
     const validationSchema = Yup.object().shape({
@@ -57,6 +57,36 @@ export default function AddEditTask({ open, handleToggle, onSave }: Props) {
         resolver: yupResolver(validationSchema),
     });
 
+    useEffect(() => {
+        if (taskEditData) {
+            const { taskTitle, description, dueDate, taskStatus, taskCategory } = taskEditData;
+            const formattedDueDate = dueDate ? new Date(dueDate.seconds * 1000) : null;
+            reset({
+                taskTitle: taskTitle || "",
+                description: description || "",
+                dueDate: formattedDueDate,
+                taskStatus: taskStatus || "",
+                taskCategory: taskCategory || "",
+            });
+
+
+            setTaskData({
+                id:taskEditData.id,
+                taskTitle: taskTitle || "",
+                description: description || "",
+                dueDate: formattedDueDate,
+                taskStatus: taskStatus || "",
+                img: taskEditData.img || ''
+            });
+            setImagePreview(taskEditData.img || null);
+        } else {
+            reset();
+            setTaskData({});
+            setImagePreview(null);
+        }
+    }, [taskEditData]);
+
+
     // File Code with drag and drop and preview image
     const handleFileChange = async (event: any) => {
 
@@ -65,7 +95,7 @@ export default function AddEditTask({ open, handleToggle, onSave }: Props) {
         const formData = new FormData()
         formData.append("file", file)
         formData.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET)
-        formData.append('cloud_name',  import.meta.env.VITE_CLOUD_NAME)
+        formData.append('cloud_name', import.meta.env.VITE_CLOUD_NAME)
         const res = await fetch('https://api.cloudinary.com/v1_1/dhhr6cbqr/image/upload', {
             method: 'POST',
             body: formData
@@ -115,6 +145,7 @@ export default function AddEditTask({ open, handleToggle, onSave }: Props) {
             const success = await onSave(taskData);
             if (success) {
                 reset();
+                resetEdit();
             }
         } catch (error) {
             console.error("Error saving task:", error);
@@ -182,7 +213,7 @@ export default function AddEditTask({ open, handleToggle, onSave }: Props) {
                                             key={category}
                                             onClick={() => {
                                                 setValue('taskCategory', category);
-                                                handleFieldChange("description", category); // Update the form state with the selected category
+                                                handleFieldChange("taskCategory", category); // Update the form state with the selected category
                                                 clearErrors('taskCategory');          // Clear the error for taskCategory after selection
                                             }}
                                             className={`px-4 py-2 rounded-full border ${watch('taskCategory') === category
@@ -313,7 +344,13 @@ export default function AddEditTask({ open, handleToggle, onSave }: Props) {
                         <Button
                             variant="text"
                             color="red"
-                            onClick={handleToggle}
+                            onClick={() => {
+                                handleToggle(); // Toggle modal
+                                reset(); // Reset form
+                                resetEdit()
+
+
+                            }}
                             className="mr-1 rounded-full border bg-gray-200"
                             {...(undefined as any)}
                         >

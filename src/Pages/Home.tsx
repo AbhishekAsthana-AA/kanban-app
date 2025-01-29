@@ -11,13 +11,14 @@ import AccordionComponent from "../Components/UserInterface/Accordian";
 import Board from "../Components/UserInterface/Board";
 import AddEditTask from "../Components/UserInterface/AddEditTask";
 import { auth, db } from "../Firebase/firebase";
-import { doc, setDoc, serverTimestamp, collection, getDocs, query, where, orderBy, updateDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection,deleteDoc, getDocs, query, where, orderBy, updateDoc } from "firebase/firestore";
 import { toast } from 'react-toastify';
 import { useState, useEffect } from "react";
 import { taskCategories } from "../Utils/data";
 import { Select, Option, Typography, Input } from "@material-tailwind/react"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { startAt, endAt } from "firebase/firestore";
+import { useAuth } from "../Hooks/auth";
 
 interface Task {
   id: string;
@@ -35,10 +36,12 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("list");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [editTaskData, setEditTaskData] = useState({});
   const [payload, setPayload] = useState({
     taskStatus:'',
     taskTitle:''
   });
+  const  user  = useAuth();
 
 
   useEffect(() => {
@@ -52,6 +55,7 @@ export default function Home() {
       const taskDataRef = collection(db, "taskdata");
 
       let filters: any[] = [];
+      filters.push(where("uid", "==", user.uid));
       if (payload.taskStatus) {
         filters.push(where("taskStatus", "==", payload.taskStatus));
       }
@@ -81,7 +85,6 @@ export default function Home() {
         };
       });
 
-      // console.log(data);
       setTasks(data);
       toast.success('Data Fetch Successfully');
     } catch (error:any) {
@@ -94,29 +97,47 @@ export default function Home() {
       ...prev,
       [fieldName]: value,
     }));
-    // fetchDocuments();
-
   };
 
   //status Change
   const handleStatusChange = async (newStatus: any, taskId: number) => {
-    // const newStatus = e.target.value;
     try {
       const taskDocRef = doc(db, "taskdata", taskId.toString());
       await updateDoc(taskDocRef, { taskStatus: newStatus });
       fetchDocuments();
-      // console.log(`Task ${taskId} updated to status: ${newStatus}`);
     } catch (error) {
       console.error("Error updating task status:", error);
     }
   };
+
+  const handleEditTask =async (data:any)=>{
+    console.log(data);
+    setEditTaskData(data)
+    toggleModal();
+  }
+
+  const handleResetEditTask=()=>{
+    setEditTaskData({})
+  }
+
+  const handleDeleteTask = async (id: string) => {
+    try {
+        const taskDocRef = doc(db, 'taskdata', id);
+        await deleteDoc(taskDocRef);
+        fetchDocuments();
+        toast.success('Task deleted successfully');
+    } catch (error:any) {
+        toast.error('Error deleting task: ' + error.message);
+        console.log(error);
+    }
+};
 
   const data = [
     {
       label: "List",
       value: "list",
       icon: 'fa fa-list',
-      desc: <AccordionComponent tasks={tasks} updateStatus={handleStatusChange} />,
+      desc: <AccordionComponent tasks={tasks} updateStatus={handleStatusChange} onEdit={handleEditTask} ondelete={handleDeleteTask} />,
     },
     {
       label: " Board",
@@ -126,18 +147,32 @@ export default function Home() {
     },
   ];
 
+ 
+
   //save task
   const handleSaveTask = async (data: any) => {
 
     const res: any = await auth.currentUser
+    const taskId = data.id;
     try {
-      const id = Date.now().toString()
-      await setDoc(doc(db, 'taskdata', id), {
-        ...data,
-        id: id,
-        uid: res.uid,
-        timeStamp: serverTimestamp(),
-      })
+      if(taskId){
+        const taskDocRef = doc(db, 'taskdata', taskId);
+        await updateDoc(taskDocRef, {
+            ...data,
+            uid: res.uid,
+            timeStamp: serverTimestamp(),
+        });
+        toast.success('Task updated successfully');
+      }else{
+        const id = Date.now().toString()
+        await setDoc(doc(db, 'taskdata', id), {
+          ...data,
+          id: id,
+          uid: res.uid,
+          timeStamp: serverTimestamp(),
+        })
+      }
+     
       toggleModal();
       fetchDocuments();
       toast.success('Data Save Successfully');
@@ -181,9 +216,6 @@ export default function Home() {
               <TabPanel key={value} value={value}>
 
                 {/* Flter By */}
-
-
-
                 <div className="py-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <Typography variant="paragraph" color="blue-gray" className="font-medium w-48"
@@ -230,9 +262,6 @@ export default function Home() {
                   </div>
                 </div>
 
-
-
-
                 {/* Header */}
                 {value === "list" ? (
                   <ul className="border-t flex  items-center justify-between gap-4 p-2 hidden md:flex">
@@ -242,12 +271,8 @@ export default function Home() {
                     <li className="text-center md:text-left w-80">Task Category</li>
                     <li className="text-center md:text-left w-80"></li>
 
-
                   </ul>
                 ) : null}
-
-
-
 
                 {/* Accordian */}
                 {desc}
@@ -255,12 +280,9 @@ export default function Home() {
             ))}
           </TabsBody>
         </Tabs>
-
         <AddEditTask open={isModalOpen} handleToggle={toggleModal}
-          onSave={handleSaveTask} />
+          onSave={handleSaveTask} taskEditData={editTaskData} resetEdit={handleResetEditTask} />
       </div>
-      {/* <ToastContainer 
-      /> */}
     </>
   );
 }
