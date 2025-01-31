@@ -47,23 +47,24 @@ num run dev
 
 
 ### Folder Structure
-task-mangement-app/
+ ```bash
+task-managemet-app/
 │
-├── src/
+├── src/                     # Source code
 │   ├── assets/              # Static files (images, etc.)
 │   ├── Components/          # React components
 │   ├── Firebase/            # Firebase configuration and utilities
 │   ├── Pages/               # React pages
-|   ├── Layouts/               # Layout pages
-|   ├── Utils/               # Utils data export
-|   |── Routes/               # Routes
+│   ├── Layouts/             # Layout pages
+│   ├── Utils/               # Utility functions and data exports
+│   ├── Routes/              # Routes
 │   ├── App.tsx              # Main App component
 │   └── index.tsx            # Entry point for React
 │
 ├── public/                  # Public assets and index.html
 ├── .env                     # Firebase credentials and environment variables
 ├── package.json             # NPM dependencies and scripts
-└── README.md    
+└── README.md                # This file  
 
 
 
