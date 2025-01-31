@@ -35,16 +35,23 @@ Follow the steps below to get your project up and running.
    Open your terminal and run the following command:
 
    ```bash
- 
- git clone https://github.com/your-username/kanban-app.git](https://github.com/AbhishekAsthana-AA/kanban-app.git
+    git clone https://github.com/your-username/kanban-app.git](https://github.com/AbhishekAsthana-AA/kanban-app.git
 
-2.**Intall Dependencies:**
-nmp install
+2. **Install Dependencies:**
 
-3.**Run project:**
-num run dev
+   ```bash
+    npm install
 
+3. **Start the development server:**
 
+   ```bash
+    npm run dev
+
+   
+4. **Open the application in your browser:**
+
+   ```bash
+    http://localhost:5173
 
 ### Folder Structure
  ```bash
