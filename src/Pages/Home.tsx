@@ -125,6 +125,11 @@ export default function Home() {
             month: 'long',
             day: 'numeric',
           }),
+          uploadImgTime: docData.uploadImgTime?new Date(docData.uploadImgTime.seconds * 1000).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }):'',
         };
       });
 
