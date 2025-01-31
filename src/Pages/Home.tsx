@@ -49,7 +49,7 @@ export default function Home() {
   const user: any = useAuth();
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const handleDateChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
@@ -66,7 +66,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchDocuments();
-  }, [payload])
+  }, [payload,sortOrder])
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -105,7 +105,7 @@ export default function Home() {
         q = taskDataRef;
       }
       const querySnapshot = await getDocs(q);
-      const data: any = querySnapshot.docs.map((doc) => {
+      let data: any = querySnapshot.docs.map((doc) => {
         const docData = doc.data();
         return {
           id: doc.id,
@@ -115,21 +115,21 @@ export default function Home() {
             month: 'long',
             day: 'numeric',
           }),
-          statusChangeTime: docData.statusChangeTime?new Date(docData.statusChangeTime.seconds * 1000).toLocaleDateString('en-US', {
+          statusChangeTime: docData.statusChangeTime ? new Date(docData.statusChangeTime.seconds * 1000).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
-          }):'',
+          }) : '',
           timeStamp: new Date(docData.timeStamp.seconds * 1000).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
           }),
-          uploadImgTime: docData.uploadImgTime?new Date(docData.uploadImgTime.seconds * 1000).toLocaleDateString('en-US', {
+          uploadImgTime: docData.uploadImgTime ? new Date(docData.uploadImgTime.seconds * 1000).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
-          }):'',
+          }) : '',
         };
       });
 
@@ -137,15 +137,23 @@ export default function Home() {
         const startDate = new Date(payload.startDate);
         const endDate = new Date(payload.endDate);
 
-        const filteredTasks = data.filter((task: any) => {
+         data = data.filter((task: any) => {
           const taskDueDate = new Date(task.date);
           return taskDueDate >= startDate && taskDueDate <= endDate;
         });
+        // setTasks(filteredTasks);
+      } 
 
-        setTasks(filteredTasks);
-      } else {
-        setTasks(data);
-      }
+      data.sort((a: any, b: any) => {
+        const dateA = a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate.seconds * 1000);
+        const dateB = b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate.seconds * 1000);
+      
+        return sortOrder === "asc"
+          ? dateA.getTime() - dateB.getTime() 
+          : dateB.getTime() - dateA.getTime();
+      });
+
+      setTasks(data);
       toast.success('Data Fetch Successfully');
     } catch (error: any) {
       toast.error(error.message || "Error fetching tasks");
@@ -310,7 +318,7 @@ export default function Home() {
                     </Typography>
 
                     <Select size="md" label="Category" className="overflow-hidden "
-                    value={payload.taskCategory} 
+                      value={payload.taskCategory}
                       onChange={(value) => {
                         handleFilterChange("taskCategory", value);
                       }}
@@ -338,7 +346,7 @@ export default function Home() {
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <Input type="text" placeholder="Search" className="w-52 pl-10 rounded-full"
-                       value={payload.taskTitle} 
+                        value={payload.taskTitle}
                         onChange={(e) => {
                           handleFilterChange("taskTitle", e.target.value);
                         }}
@@ -361,7 +369,17 @@ export default function Home() {
                 {value === "list" ? (
                   <ul className="border-t flex  items-center justify-between gap-4 p-2 hidden md:flex">
                     <li className="text-center md:text-left w-96">Task Name</li>
-                    <li className="text-center md:text-left w-80">Due On</li>
+                    <li className="text-center md:text-left w-80">
+                      Due On
+                      <button
+                        className="ml-2 text-sm font-bold cursor-pointer"
+                        onClick={() => {
+                          setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                        }}
+                      >
+                        {sortOrder === "asc" ? "▲" : "▼"}
+                      </button>
+                    </li>
                     <li className="text-center md:text-left w-80">Task Status</li>
                     <li className="text-center md:text-left w-80">Task Category</li>
                     <li className="text-center md:text-left w-80"></li>
