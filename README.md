@@ -42,6 +42,19 @@ Follow the steps below to get your project up and running.
    ```bash
     npm install
 
+3. **Setup enviroment variable:**
+
+   ```bash
+    .env file
+     VITE_FIREBASE_API_KEY='xtyz'
+     VITE_FIREBASE_AUTH_DOMAIN='xtyz'
+     VITE_FIREBASE_PROJECT_ID="xtyz"
+     VITE_FIREBASE_STORAGE_BUCKET='xtyzp'
+     VITE_FIREBASE_MESSAGING_SENDER_ID='xtyz'
+     VITE_FIREBASE_APP_ID='xtyz'
+    VITE_UPLOAD_PRESET='xtyz'
+    VITE_CLOUD_NAME='xtyz'
+
 3. **Start the development server:**
 
    ```bash
