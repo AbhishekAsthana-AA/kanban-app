@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { doc, setDoc } from "firebase/firestore";
 
 
+const baseUrl = process.env.REACT_APP_BASE_URL;
 export default function Login() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -91,7 +92,7 @@ export default function Login() {
 
             <div className="flex-1 flex items-center justify-center p-4">
                 <img
-                    src="./src/assets/taskPage.png"
+                    src={`${baseUrl}/assets/taskPage.png`} // Dynamically construct the URL
                     className="w-full max-w-3xl max-h-full object-contain shadow-lg rounded-lg"
                     alt="Task Board"
                 />
