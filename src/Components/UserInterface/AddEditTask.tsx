@@ -12,7 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { taskCategories } from "../../Utils/data";
 import { useEffect } from "react";
-
+import { serverTimestamp } from "firebase/firestore";
 
 
 const categories = ["Work", "Personal"];
@@ -24,14 +24,18 @@ interface Props {
     resetEdit: () => any;
     taskEditData: any
 }
+
+  
 export default function AddEditTask({ open, handleToggle, onSave, taskEditData, resetEdit }: Props) {
 
     const [imagePreview, setImagePreview] = useState(null);
-    const [taskData, setTaskData] = useState({});
+    const [taskData, setTaskData] = useState<any>({});;
 
     // Validation Shema
     const validationSchema = Yup.object().shape({
-        taskTitle: Yup.string().required("Task title is required"),
+        taskTitle: Yup.string()
+            .required("Task title is required")
+            .max(50, "Task title cannot exceed 200 characters"),
         description: Yup.string().required("Task description is required"),
         dueDate: Yup.date().required("Due date is required").nullable(),
         taskStatus: Yup.string().required("Task status is required"),
@@ -58,6 +62,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
     });
 
     useEffect(() => {
+        console.log(taskEditData);
         if (taskEditData) {
             const { taskTitle, description, dueDate, taskStatus, taskCategory } = taskEditData;
             const formattedDueDate = dueDate ? new Date(dueDate.seconds * 1000) : null;
@@ -71,7 +76,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
 
 
             setTaskData({
-                id:taskEditData.id,
+                id: taskEditData.id,
                 taskTitle: taskTitle || "",
                 description: description || "",
                 dueDate: formattedDueDate,
@@ -96,7 +101,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
         formData.append("file", file)
         formData.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET)
         formData.append('cloud_name', import.meta.env.VITE_CLOUD_NAME)
-        const res = await fetch('https://api.cloudinary.com/v1_1/dhhr6cbqr/image/upload', {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/image/upload`, {
             method: 'POST',
             body: formData
         })
@@ -104,7 +109,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
         const uploadImageBaseUrl = await res.json()
         console.log(uploadImageBaseUrl.url);
         if (uploadImageBaseUrl.url) {
-            setTaskData((prev) => ({ ...prev, img: uploadImageBaseUrl.url }))
+            setTaskData((prev:any) => ({ ...prev, img: uploadImageBaseUrl.url,uploadImgTime:serverTimestamp() }))
             displayImagePreview(file);
         }
     };
@@ -113,10 +118,22 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
         event.preventDefault();
     };
 
-    const handleDrop = (event: any) => {
+    const handleDrop =async  (event: any) => {
         event.preventDefault();
         const file = event.dataTransfer.files[0];
-        if (file) {
+        if (!file) return;
+        const formData = new FormData()
+        formData.append("file", file)
+        formData.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET)
+        formData.append('cloud_name', import.meta.env.VITE_CLOUD_NAME)
+        const res = await fetch('https://api.cloudinary.com/v1_1/dhhr6cbqr/image/upload', {
+            method: 'POST',
+            body: formData
+        })
+        const uploadImageBaseUrl = await res.json()
+        console.log(uploadImageBaseUrl.url);
+        if (uploadImageBaseUrl.url) {
+            setTaskData((prev:any) => ({ ...prev, img: uploadImageBaseUrl.url,uploadImgTime:serverTimestamp() }))
             displayImagePreview(file);
         }
     };
@@ -132,7 +149,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
 
     //Set form task in taskData object
     const handleFieldChange = (fieldName: any, value: any) => {
-        setTaskData((prev) => ({
+        setTaskData((prev:any) => ({
             ...prev,
             [fieldName]: value,
         }));
@@ -146,35 +163,55 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
             if (success) {
                 reset();
                 resetEdit();
+                handleToggle();
             }
         } catch (error) {
             console.error("Error saving task:", error);
         }
     };
 
+    // const StatusChangeTime = (statusChangeTime:any ) => {
+       
+    //     // const date = new Date((statusChangeTime.seconds * 1000) + (statusChangeTime.nanoseconds / 1000000));
+    //     // const options = { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+    //     // const formattedDate = date.toLocaleString('en-US', options);
+    //     // return formattedDate
+    //   };
+    
+
     return (
         <>
-
-            <Dialog open={open} size="md" handler={handleToggle}    {...(undefined as any)}>
+            <Dialog open={open} size={taskData.id?'xl':'md'} handler={handleToggle}    {...(undefined as any)}>
                 <DialogHeader    {...(undefined as any)}>Create Task</DialogHeader>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+
+                <div className={`${taskData.id?'flex  gap-2':''}`}>
+              
+                <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col gap-4  ${taskData.id ? 'w-[1000px]':''}`}>
                     <DialogBody className="overflow-y-auto max-h-[400px]"    {...(undefined as any)}>
 
                         <div>
+
                             <Controller
                                 name="taskTitle"
                                 control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        {...field}
-                                        size="sm"
-                                        label="Task Title"
-                                        onChange={(e) => {
-                                            field.onChange(e); // Update the form state
-                                            handleFieldChange("taskTitle", e.target.value); // Update taskData
-                                        }}
-                                        {...(undefined as any)}
-                                    />
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Input
+                                            {...field}
+                                            {...(undefined as any)}
+                                            size="sm"
+                                            label="Task Title"
+                                            onChange={(e) => {
+                                                if (e.target.value.length <= 50) {
+                                                    field.onChange(e);
+                                                    handleFieldChange("taskTitle", e.target.value);
+                                                }
+                                            }}
+                                        />
+                                        {fieldState?.error && fieldState.error.type === 'max' && (
+                                            <p className="text-red-500 text-sm">{fieldState.error.message}</p>
+                                        )}
+                                    </>
                                 )}
                             />
                             <div className="text-red-500 text-xs">{errors.taskTitle?.message}</div>
@@ -367,6 +404,30 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
                         </Button>
                     </DialogFooter>
                 </form>
+                
+              {
+                taskData.id ?
+                <div className="bg-gray-100  rounded-lg shadow-md">
+                <h1 className="px-3 text-black text-lg font-semibold mb-3">Activity</h1>
+                <div className="bg-white rounded-lg shadow p-4">
+                    <div className="flex justify-between border-b py-2 text-gray-800">
+                        <span className="text-sm">You created this task</span>
+                        <span className="text-gray-500 text-sm">{taskEditData.timeStamp}</span>
+                    </div>
+                    <div className="flex justify-between border-b py-2 text-gray-800">
+                        <span className="text-sm">{taskEditData.statusChangeTrack}</span>
+                        <span className="text-gray-500 text-sm">{taskEditData.statusChangeTime}</span>
+                    </div>
+                    <div className="flex justify-between py-2 text-gray-800">
+                        <span className="text-sm">You uploaded file</span>
+                        <span className="text-gray-500 text-sm">Dec 29 at 1:15 pm</span>
+                    </div>
+                </div>
+            </div>
+    
+             :''
+              }  
+                </div>
             </Dialog>
 
         </>
