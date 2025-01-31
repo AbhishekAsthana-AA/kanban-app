@@ -52,9 +52,9 @@ export default function Header() {
 
 
   return (
-    <div className="flex justify-between p-4 transition-colors duration-300 m-3">
+    <div className="flex justify-between p-4 transition-colors duration-300 "  style={{ backgroundColor: "#e1c1e4" }}>
       <h1 className="flex text-2xl dark:text-blue font-bold items-center gap-2">
-        TaskBuddy
+      <i className='fa fa-file' aria-hidden="true"></i> TaskBuddy
       </h1>
 
       <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">

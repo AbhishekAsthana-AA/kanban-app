@@ -15,7 +15,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         <meta name="keywords" content="React, Web Development, JavaScript" />
         <meta name="author" content="Your Name" />
       </Helmet>
-
       <Header />
       <main>{children}</main>
 
