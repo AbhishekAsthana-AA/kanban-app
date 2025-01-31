@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
 // import { taskCategories } from "../Utils/data";
 import { Select, Option, Typography, Input } from "@material-tailwind/react"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { startAt, endAt } from "firebase/firestore";
+import { startAt, endAt, writeBatch } from "firebase/firestore";
 import { useAuth } from "../Hooks/auth";
 import { ToastContainer } from 'react-toastify';
 import DatePicker from "react-datepicker";
@@ -66,7 +66,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchDocuments();
-  }, [payload,sortOrder])
+  }, [payload, sortOrder])
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -119,16 +119,28 @@ export default function Home() {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
           }) : '',
           timeStamp: new Date(docData.timeStamp.seconds * 1000).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
           }),
           uploadImgTime: docData.uploadImgTime ? new Date(docData.uploadImgTime.seconds * 1000).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
           }) : '',
         };
       });
@@ -137,19 +149,19 @@ export default function Home() {
         const startDate = new Date(payload.startDate);
         const endDate = new Date(payload.endDate);
 
-         data = data.filter((task: any) => {
+        data = data.filter((task: any) => {
           const taskDueDate = new Date(task.date);
           return taskDueDate >= startDate && taskDueDate <= endDate;
         });
         // setTasks(filteredTasks);
-      } 
+      }
 
       data.sort((a: any, b: any) => {
         const dateA = a.dueDate instanceof Date ? a.dueDate : new Date(a.dueDate.seconds * 1000);
         const dateB = b.dueDate instanceof Date ? b.dueDate : new Date(b.dueDate.seconds * 1000);
-      
+
         return sortOrder === "asc"
-          ? dateA.getTime() - dateB.getTime() 
+          ? dateA.getTime() - dateB.getTime()
           : dateB.getTime() - dateA.getTime();
       });
 
@@ -226,6 +238,33 @@ export default function Home() {
   };
 
 
+  const handleBulkDelete = async (selectedTasks: any) => {
+    if (selectedTasks.length === 0) {
+      toast.info("No tasks selected for deletion.");
+      return;
+    }
+
+    const isConfirmed = window.confirm(`Are you sure you want to delete ${selectedTasks.length} tasks?`);
+    if (!isConfirmed) {
+      toast.info("Bulk delete canceled.");
+      return;
+    }
+
+    try {
+      const batch = writeBatch(db);
+      selectedTasks.forEach((taskId: any) => {
+        const taskDocRef = doc(db, "taskdata", taskId);
+        batch.delete(taskDocRef);
+      });
+      await batch.commit();
+      fetchDocuments();
+      toast.success("Tasks deleted successfully.");
+    } catch (error: any) {
+      toast.error("Error deleting tasks: " + error.message);
+      console.log(error);
+    }
+  };
+
   //save task
   const handleSaveTask = async (data: any) => {
 
@@ -266,7 +305,7 @@ export default function Home() {
       value: "list",
       icon: 'fa fa-list',
       desc: <AccordionComponent tasks={tasks} updateStatus={handleStatusChange} onEdit={handleEditTask} ondelete={handleDeleteTask}
-        onSave={handleSaveTask} />,
+        onSave={handleSaveTask} bulkDelete={handleBulkDelete} />,
     },
     {
       label: " Board",
@@ -324,7 +363,7 @@ export default function Home() {
                       }}
                       {...(undefined as any)}>
                       {categories.map((category: any) => (
-                        <Option key={category.id} value={category} className="truncate">
+                        <Option key={category} value={category} className="truncate">
                           {category}
                         </Option>
                       ))}

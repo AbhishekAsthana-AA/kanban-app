@@ -250,7 +250,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
 
                                 <div className="col-span-1">
                                     <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2"    {...(undefined as any)}>
-                                        Task Category
+                                        Task Category <span style={{color:'red'}}>*</span>
                                     </Typography>
                                     <div className="flex gap-2 mt">
                                         {categories.map((category) => (
@@ -278,7 +278,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
 
                                 <div className="col-span-1">
                                     <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2"    {...(undefined as any)}>
-                                        Due On
+                                        Due On  <span style={{color:'red'}}>*</span>
                                     </Typography>
                                     <Controller
                                         name="dueDate"
@@ -303,7 +303,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
 
                                 <div className="col-span-1">
                                     <Typography variant="paragraph" color="blue-gray" className="font-medium mb-2"    {...(undefined as any)}>
-                                        Task Status
+                                        Task Status <span style={{color:'red'}}>*</span>
                                     </Typography>
                                     <Controller
                                         name="taskStatus"

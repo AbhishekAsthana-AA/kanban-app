@@ -21,6 +21,7 @@ interface Props {
     onEdit: (id: any) => any;
     ondelete: (id: any) => any;
     onSave: (data: any) => any;
+    bulkDelete: (data: any) => any;
 
 }
 interface Task {
@@ -31,7 +32,7 @@ interface Task {
     taskStatus: string;
 }
 
-export default function AccordionComponent({ tasks, updateStatus, onEdit, ondelete, onSave }: Props) {
+export default function AccordionComponent({ tasks, updateStatus, onEdit, ondelete, onSave, bulkDelete }: Props) {
     const [open, setOpen] = React.useState([true, true, true]);
     const [openRowTask, setOpenRowTask] = React.useState(false)
     const [selectedTasks, setSelectedTasks] = React.useState<number[]>([]);
@@ -67,15 +68,13 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
 
             if (!newTask.taskTitle.trim()) return;
             const success = await onSave(newTask)
-            console.log(newTask);
             if (success) {
+                setOpenRowTask(false)
                 setNewTask({ taskTitle: "", dueDate: null, taskStatus: "TO_DO", taskCategory: "WORK" });
             }
         } catch (error) {
             console.error("Error saving task:", error);
         }
-
-
     };
 
     const handleStatusDataChange = async (e: any, taskId: number,prevTask:any) => {
@@ -131,7 +130,6 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
 
     const handleStatusChange = (newStatus: string) => {
         selectedTasks.forEach((id: any) => {
-            // console.log(newStatus,id,prevTaskStatuses[Number(id)]);
             updateStatus(newStatus,id,prevTaskStatuses[Number(id)])
         });
         setSelectedTasks([]);
@@ -139,7 +137,7 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
     };
 
     const handleBulkDelete = () => {
-        selectedTasks.forEach((id) => ondelete(id));
+        bulkDelete(selectedTasks)
         setSelectedTasks([]);
     };
 
@@ -226,7 +224,12 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
                                                 size="sm"
                                                 label="Task Title"
                                                 value={newTask.taskTitle}
-                                                onChange={(e) => setNewTask({ ...newTask, taskTitle: e.target.value })}
+                                                onChange={(e) => {
+                                                    if (e.target.value.length <= 50) {
+                                                        setNewTask({ ...newTask, taskTitle: e.target.value })
+                                                    }
+                                                }}
+                                          
                                                 className="w-[250px] w-48 h-1 w-0 min-w-[200px] "
                                                 {...(undefined as any)}
                                             />
@@ -306,7 +309,14 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
                         }
                     </div>
 
-                    {renderTasksByStatus("TO_DO")}
+                    {tasks.filter((task: any) => task.taskStatus === "TO_DO").length ?renderTasksByStatus("TO_DO"):
+                    
+                    <div>
+                        <p className="text-black text-sm text-center p-3">No Task In To Do </p>
+                    </div>
+                    
+                    
+                }
                 </AccordionBody>
             </Accordion>
             </motion.div>
@@ -324,7 +334,14 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
                     In-Progress ({tasks.filter((task: any) => task.taskStatus === "IN_PROGRESS").length})
                 </AccordionHeader>
                 <AccordionBody className="pt-4 py-0 text-base font-normal">
-                    {renderTasksByStatus("IN_PROGRESS")}
+                    {tasks.filter((task: any) => task.taskStatus === "IN_PROGRESS").length >0 ?renderTasksByStatus("IN_PROGRESS") :
+                    
+                    <div>
+                        <p className="text-black text-sm text-center p-3">No  Task In-Progress </p>
+                    </div>
+                    
+                    
+                    } 
                 </AccordionBody>
             </Accordion>
             </motion.div>
@@ -343,7 +360,15 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
                     Completed ({tasks.filter((task: any) => task.taskStatus === "COMPLETED").length})
                 </AccordionHeader>
                 <AccordionBody className="pt-4 py-0 text-base font-normal">
-                    {renderTasksByStatus("COMPLETED")}
+                    {tasks.filter((task: any) => task.taskStatus === "COMPLETED").length?renderTasksByStatus("COMPLETED")
+                    :
+                    
+                    <div>
+                        <p className="text-black text-sm text-center p-3">No Task Completed </p>
+                    </div>
+                    
+                    
+                }
                 </AccordionBody>
             </Accordion>
             </motion.div>
