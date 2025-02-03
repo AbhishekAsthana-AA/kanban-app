@@ -198,7 +198,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
                 {...(undefined as any)}>
 
                 <DialogHeader    {...(undefined as any)}>Create Task</DialogHeader>
-                <Tabs value={selectedTab} className="lg:hidden mb-3">
+                {taskData.id ?<Tabs value={selectedTab} className="lg:hidden mb-3">
                     <TabsHeader
                         className="rounded-full border-blue-gray-50 bg-gray-200 p-1 flex  mx-auto"
                         indicatorProps={{
@@ -218,7 +218,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
                             </Tab>
                         ))}
                     </TabsHeader>
-                </Tabs>
+                </Tabs>:''}
 
                 <div className={`${taskData.id ? 'flex  gap-2' : ''}`}>
                     {
