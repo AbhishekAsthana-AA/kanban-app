@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 
 interface Props {
     tasks: any;
-    updateStatus: (newStatus: string, taskId: number,prevtask:any) => any;
+    updateStatus: (newStatus: string, taskId: number, prevtask: any) => any;
     onEdit: (id: any) => any;
     ondelete: (id: any) => any;
     onSave: (data: any) => any;
@@ -57,7 +57,7 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
 
     const handleDrop = (newStatus: string) => {
         if (draggingTask && draggingTask.taskStatus !== newStatus) {
-            updateStatus(newStatus, draggingTask.id,draggingTask.taskStatus);
+            updateStatus(newStatus, draggingTask.id, draggingTask.taskStatus);
             setDraggingTask(null);
         }
     };
@@ -77,11 +77,11 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
         }
     };
 
-    const handleStatusDataChange = async (e: any, taskId: number,prevTask:any) => {
+    const handleStatusDataChange = async (e: any, taskId: number, prevTask: any) => {
         // console.log(prevTask);
         const newStatus = e.target.value;
         // console.log(newStatus);
-        await updateStatus(newStatus, taskId,prevTask)
+        await updateStatus(newStatus, taskId, prevTask)
     };
 
     const handleEdit = (id: number) => {
@@ -118,19 +118,19 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
             } else {
                 updatedPrev[taskId] = prevTaskStatus;
             }
-        
+
             return updatedPrev;
         });
-    
+
         setSelectedTasks((prev) =>
             prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
         );
     };
-    
+
 
     const handleStatusChange = (newStatus: string) => {
         selectedTasks.forEach((id: any) => {
-            updateStatus(newStatus,id,prevTaskStatuses[Number(id)])
+            updateStatus(newStatus, id, prevTaskStatuses[Number(id)])
         });
         setSelectedTasks([]);
         setPrevTaskStatuses({})
@@ -141,241 +141,270 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
         setSelectedTasks([]);
     };
 
+    const handleCancelSeletedTask = () => {
+        setSelectedTasks([]);
+    }
+
     const renderTasksByStatus = (status: string) => {
-    
+
         return tasks
             .filter((task: any) => task.taskStatus === status)
             .map((task: any) => (
                 <motion.div
-                key={task.id}
+                    key={task.id}
                     className=" cursor-pointer"
                     draggable
                     onDragStart={() => handleDragStart(task)}
                     whileDrag={{ scale: 1.1, boxShadow: "0px 10px 20px rgba(0,0,0,0.2)" }}
                 >
-                <ul key={task.id} className="border-b flex  items-center justify-between gap-4 rounded-lg pb-3 text-black-900 p-2">
-                    <li className="flex  items-center w-96">
-                        <input type="checkbox" id={`task-${task.id}`} className="mr-2"
-                        checked={selectedTasks.includes(task.id)}
-                        onChange={() => handleCheckboxChange(task.id,task.taskStatus)} />
-                      <span className="md:text-left truncate w-[200px]">{task.taskTitle}</span>
-                    </li>
-                    <li className="md:text-left truncate hidden md:grid w-80">
-                        <span >{task.date}</span>
-                    </li>
-                    <li className="md:text-left truncate hidden md:grid w-80">
+                    <ul key={task.id} className="border-b flex  items-center justify-between gap-4 rounded-lg pb-3 text-black-900 p-2">
+                        <li className="flex  items-center w-96">
+                            <input type="checkbox" id={`task-${task.id}`} className="mr-2"
+                                checked={selectedTasks.includes(task.id)}
+                                onChange={() => handleCheckboxChange(task.id, task.taskStatus)} />
+                            <span className="md:text-left truncate w-[200px]">{task.taskTitle}</span>
+                        </li>
+                        <li className="md:text-left truncate hidden md:grid w-80">
+                            <span >{task.date}</span>
+                        </li>
+                        <li className="md:text-left truncate hidden md:grid w-80">
 
-                        <select
-                            className="border p-1 rounded"
-                            onChange={(e) => handleStatusDataChange(e, task.id, task.taskStatus)}
-                            value={task.taskStatus}
-                        >
-                            <option value="TO_DO">To-Do</option>
-                            <option value="IN_PROGRESS">In-Progress</option>
-                            <option value="COMPLETED">Completed</option>
-                        </select>
-                    </li>
-                    <li className="md:text-left truncate hidden md:grid w-80">
-                        <span>{task.taskCategory}</span>
-                    </li>
-                    <li className="flex hidden md:grid w-80">
-                        <span className="flex gap-2 ">
-                            <button className="text-lg" onClick={() => handleEdit(task)} >
-                                <i className="fa fa-edit text-blue-600 md:text-left "></i>
-                            </button>
-                            <button className="text-lg" onClick={() => handleDelete(task.id)}>
-                                <i className="fa fa-trash text-red-600 md:text-left "></i>
-                            </button>
-                        </span>
-                    </li>
+                            <select
+                                className="border p-1 rounded"
+                                onChange={(e) => handleStatusDataChange(e, task.id, task.taskStatus)}
+                                value={task.taskStatus}
+                            >
+                                <option value="TO_DO">To-Do</option>
+                                <option value="IN_PROGRESS">In-Progress</option>
+                                <option value="COMPLETED">Completed</option>
+                            </select>
+                        </li>
+                        <li className="md:text-left truncate hidden md:grid w-80">
+                            <span>{task.taskCategory}</span>
+                        </li>
+                        <li className="flex  md:grid w-80">
+                            <span className="flex gap-2 ">
 
-                </ul>
+                                <Menu placement="bottom-end">
+                                    <MenuHandler>
+                                        <button className="text-gray-600 focus:outline-none">
+                                            <i className="fa fa-ellipsis-h text-lg"></i>
+                                        </button>
+                                    </MenuHandler>
+                                    <MenuList className="shadow-lg rounded-lg p-2 w-36 bg-white" {...(undefined as any)}>
+                                        {task.taskStatus != 'COMPLETED' ? <MenuItem {...(undefined as any)}
+                                            className="text-sm text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
+                                            onClick={() => handleEdit(task)}
+                                        >
+                                            <i className="fa fa-edit text-blue-600"></i> Edit
+                                        </MenuItem> : ''
+
+
+                                        }
+                                        <MenuItem {...(undefined as any)}
+                                            className="text-sm text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
+                                            onClick={() => handleDelete(task.id)}
+                                        >
+                                            <i className="fa fa-trash text-red-600"></i> Delete
+                                        </MenuItem>
+                                    </MenuList>
+                                </Menu>
+                                {/* <button className="text-lg" onClick={() => handleEdit(task)} >
+                                    <i className="fa fa-edit text-blue-600 md:text-left "></i>
+                                </button>
+                                <button className="text-lg" onClick={() => handleDelete(task.id)}>
+                                    <i className="fa fa-trash text-red-600 md:text-left "></i>
+                                </button> */}
+                            </span>
+                        </li>
+
+                    </ul>
                 </motion.div>
             ));
     };
 
     return (
         <>
-        
+
             {/* Todo Accordion */}
             <motion.div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => handleDrop("TO_DO")}
-           
+
             >
-            <Accordion open={open[0]} className="mb-2 rounded-lg border border-blue-gray-100"
-                {...(undefined as any)}>
-                <AccordionHeader onClick={() => handleOpen(0)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#fac3ff" }}
+                <Accordion open={open[0]} className="mb-2 rounded-lg border border-blue-gray-100"
                     {...(undefined as any)}>
-                    Todo ({tasks.filter((task: any) => task.taskStatus === "TO_DO").length})
-                </AccordionHeader>
-                <AccordionBody className="pt-4 py-0 text-base font-normal">
-                    <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-lg">
-                        {/* Task Title & Due Date */}
-                        <div className="flex items-center gap-4">
+                    <AccordionHeader onClick={() => handleOpen(0)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#fac3ff" }}
+                        {...(undefined as any)}>
+                        Todo ({tasks.filter((task: any) => task.taskStatus === "TO_DO").length})
+                    </AccordionHeader>
+                    <AccordionBody className="pt-4 py-0 text-base font-normal">
+                        <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-lg">
+                            {/* Task Title & Due Date */}
+                            <div className="flex items-center gap-4">
+                            </div>
+                            {
+                                openRowTask ? (
+                                    <>
+                                        <ul className="flex gap-2 items-center justify-between">
+                                            {/* Task Title Input */}
+                                            <li className="text-center md:text-left w-60">
+                                                <Input
+                                                    size="sm"
+                                                    label="Task Title"
+                                                    value={newTask.taskTitle}
+                                                    onChange={(e) => {
+                                                        if (e.target.value.length <= 50) {
+                                                            setNewTask({ ...newTask, taskTitle: e.target.value })
+                                                        }
+                                                    }}
+
+                                                    className="w-[250px] w-48 h-1 w-0 min-w-[200px] "
+                                                    {...(undefined as any)}
+                                                />
+                                            </li>
+
+                                            {/* Date Picker */}
+                                            <li className="text-center md:text-left w-60">
+                                                <DatePicker
+                                                    dateFormat="dd-MM-yyyy"
+                                                    className="border border-gray-300 rounded-md p-2 w-[150px] text-base"
+                                                    placeholderText="Select Date"
+                                                    selected={newTask.dueDate || undefined} // Convert null to undefined
+                                                    onChange={(value: Date | null) => setNewTask({ ...newTask, dueDate: value || null })}
+
+                                                    {...(undefined as any)}
+                                                />
+                                            </li>
+
+                                            {/* Status Dropdown */}
+                                            <li className="text-center md:text-left w-80">
+                                                <Menu>
+                                                    <MenuHandler>
+                                                        <Button variant="outlined" size="sm" className="flex items-center gap-2 w-[40px]"  {...(undefined as any)}>
+                                                            <PlusIcon className="w-4 h-4" />
+                                                        </Button>
+                                                    </MenuHandler>
+                                                    <MenuList  {...(undefined as any)}>
+                                                        {["TO_DO", "IN_PROGRESS", "COMPLETED"].map((taskStatus) => (
+                                                            <MenuItem key={taskStatus} onClick={() => setNewTask({ ...newTask, taskStatus })}  {...(undefined as any)}>
+                                                                {taskStatus.replace("_", "-")}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </MenuList>
+                                                </Menu>
+                                            </li>
+
+                                            {/* Category Dropdown */}
+                                            <li className="text-center md:text-left w-80">
+                                                <Menu>
+                                                    <MenuHandler>
+                                                        <Button variant="outlined" size="sm" className="flex items-center gap-2 w-[40px]"  {...(undefined as any)}>
+                                                            <PlusIcon className="w-4 h-4" />
+                                                        </Button>
+                                                    </MenuHandler>
+                                                    <MenuList  {...(undefined as any)}>
+                                                        {["Work", "Personal"].map((taskCategory) => (
+                                                            <MenuItem key={taskCategory} onClick={() => setNewTask({ ...newTask, taskCategory })}  {...(undefined as any)}>
+                                                                {taskCategory}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </MenuList>
+                                                </Menu>
+                                            </li>
+                                        </ul>
+
+                                        <div className="flex gap-2">
+                                            <Button onClick={handleAddTask} color="purple" size="sm" className="rounded-full w-[80px]"
+                                                disabled={!newTask.taskTitle || !newTask.dueDate || !newTask.taskStatus || !newTask.taskCategory}
+
+                                                {...(undefined as any)}>
+                                                ADD ↩️
+                                            </Button>
+
+                                            {/* Cancel Button */}
+                                            <Button variant="text" size="sm" className="w-[80px]"  {...(undefined as any)}
+                                                onClick={() => { setNewTask({ taskTitle: "", dueDate: null, taskStatus: "TO_DO", taskCategory: "WORK" }); setOpenRowTask(false) }}
+                                            >
+                                                CANCEL
+                                            </Button>
+                                        </div>
+                                    </>
+                                ) : <Button onClick={handleAddRowTask} color="purple" size="sm" className="w-[80px] bg-white-800 text-blue-800"
+
+                                    {...(undefined as any)}>
+                                    <i className="fa fa-plus "></i>  ADD
+                                </Button>
+                            }
                         </div>
-                        {
-                            openRowTask ? (
-                                <>
-                                    <ul className="flex gap-2 items-center justify-between">
-                                        {/* Task Title Input */}
-                                        <li className="text-center md:text-left w-60">
-                                            <Input
-                                                size="sm"
-                                                label="Task Title"
-                                                value={newTask.taskTitle}
-                                                onChange={(e) => {
-                                                    if (e.target.value.length <= 50) {
-                                                        setNewTask({ ...newTask, taskTitle: e.target.value })
-                                                    }
-                                                }}
-                                          
-                                                className="w-[250px] w-48 h-1 w-0 min-w-[200px] "
-                                                {...(undefined as any)}
-                                            />
-                                        </li>
 
-                                        {/* Date Picker */}
-                                        <li className="text-center md:text-left w-60">
-                                            <DatePicker
-                                                dateFormat="dd-MM-yyyy"
-                                                className="border border-gray-300 rounded-md p-2 w-[150px] text-base"
-                                                placeholderText="Select Date"
-                                                selected={newTask.dueDate || undefined} // Convert null to undefined
-                                                onChange={(value: Date | null) => setNewTask({ ...newTask, dueDate: value || null })}
+                        {tasks.filter((task: any) => task.taskStatus === "TO_DO").length ? renderTasksByStatus("TO_DO") :
 
-                                                {...(undefined as any)}
-                                            />
-                                        </li>
+                            <div>
+                                <p className="text-black text-sm text-center p-3">No Task In To Do </p>
+                            </div>
 
-                                        {/* Status Dropdown */}
-                                        <li className="text-center md:text-left w-80">
-                                            <Menu>
-                                                <MenuHandler>
-                                                    <Button variant="outlined" size="sm" className="flex items-center gap-2 w-[40px]"  {...(undefined as any)}>
-                                                        <PlusIcon className="w-4 h-4" />
-                                                    </Button>
-                                                </MenuHandler>
-                                                <MenuList  {...(undefined as any)}>
-                                                    {["TO_DO", "IN_PROGRESS", "COMPLETED"].map((taskStatus) => (
-                                                        <MenuItem key={taskStatus} onClick={() => setNewTask({ ...newTask, taskStatus })}  {...(undefined as any)}>
-                                                            {taskStatus.replace("_", "-")}
-                                                        </MenuItem>
-                                                    ))}
-                                                </MenuList>
-                                            </Menu>
-                                        </li>
 
-                                        {/* Category Dropdown */}
-                                        <li className="text-center md:text-left w-80">
-                                            <Menu>
-                                                <MenuHandler>
-                                                    <Button variant="outlined" size="sm" className="flex items-center gap-2 w-[40px]"  {...(undefined as any)}>
-                                                        <PlusIcon className="w-4 h-4" />
-                                                    </Button>
-                                                </MenuHandler>
-                                                <MenuList  {...(undefined as any)}>
-                                                    {["Work", "Personal"].map((taskCategory) => (
-                                                        <MenuItem key={taskCategory} onClick={() => setNewTask({ ...newTask, taskCategory })}  {...(undefined as any)}>
-                                                            {taskCategory}
-                                                        </MenuItem>
-                                                    ))}
-                                                </MenuList>
-                                            </Menu>
-                                        </li>
-                                    </ul>
-
-                                    <div className="flex gap-2">
-                                        <Button onClick={handleAddTask} color="purple" size="sm" className="rounded-full w-[80px]"
-                                            disabled={!newTask.taskTitle || !newTask.dueDate || !newTask.taskStatus || !newTask.taskCategory}
-
-                                            {...(undefined as any)}>
-                                            ADD ↩️
-                                        </Button>
-
-                                        {/* Cancel Button */}
-                                        <Button variant="text" size="sm" className="w-[80px]"  {...(undefined as any)}
-                                            onClick={() => { setNewTask({ taskTitle: "", dueDate: null, taskStatus: "TO_DO", taskCategory: "WORK" }); setOpenRowTask(false) }}
-                                        >
-                                            CANCEL
-                                        </Button>
-                                    </div>
-                                </>
-                            ) : <Button onClick={handleAddRowTask} color="purple" size="sm" className="w-[80px] bg-white-800 text-blue-800"
-
-                                {...(undefined as any)}>
-                                <i className="fa fa-plus "></i>  ADD
-                            </Button>
                         }
-                    </div>
-
-                    {tasks.filter((task: any) => task.taskStatus === "TO_DO").length ?renderTasksByStatus("TO_DO"):
-                    
-                    <div>
-                        <p className="text-black text-sm text-center p-3">No Task In To Do </p>
-                    </div>
-                    
-                    
-                }
-                </AccordionBody>
-            </Accordion>
+                    </AccordionBody>
+                </Accordion>
             </motion.div>
 
             {/* In-Progress Accordion */}
             <motion.div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => handleDrop("IN_PROGRESS")}
-            
+
             >
-            <Accordion open={open[1]} className="mb-2 rounded-lg border border-blue-gray-100"
-                {...(undefined as any)}>
-                <AccordionHeader onClick={() => handleOpen(1)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#85d9f1" }}
+                <Accordion open={open[1]} className="mb-2 rounded-lg border border-blue-gray-100"
                     {...(undefined as any)}>
-                    In-Progress ({tasks.filter((task: any) => task.taskStatus === "IN_PROGRESS").length})
-                </AccordionHeader>
-                <AccordionBody className="pt-4 py-0 text-base font-normal">
-                    {tasks.filter((task: any) => task.taskStatus === "IN_PROGRESS").length >0 ?renderTasksByStatus("IN_PROGRESS") :
-                    
-                    <div>
-                        <p className="text-black text-sm text-center p-3">No  Task In-Progress </p>
-                    </div>
-                    
-                    
-                    } 
-                </AccordionBody>
-            </Accordion>
+                    <AccordionHeader onClick={() => handleOpen(1)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#85d9f1" }}
+                        {...(undefined as any)}>
+                        In-Progress ({tasks.filter((task: any) => task.taskStatus === "IN_PROGRESS").length})
+                    </AccordionHeader>
+                    <AccordionBody className="pt-4 py-0 text-base font-normal">
+                        {tasks.filter((task: any) => task.taskStatus === "IN_PROGRESS").length > 0 ? renderTasksByStatus("IN_PROGRESS") :
+
+                            <div>
+                                <p className="text-black text-sm text-center p-3">No  Task In-Progress </p>
+                            </div>
+
+
+                        }
+                    </AccordionBody>
+                </Accordion>
             </motion.div>
 
             {/* Completed Accordion */}
             <motion.div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => handleDrop("COMPLETED")}
-             
+
             >
 
-            <Accordion open={open[2]} className="rounded-lg border border-blue-gray-100"
-                {...(undefined as any)}>
-                <AccordionHeader onClick={() => handleOpen(2)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#ceffcc" }}
+                <Accordion open={open[2]} className="rounded-lg border border-blue-gray-100"
                     {...(undefined as any)}>
-                    Completed ({tasks.filter((task: any) => task.taskStatus === "COMPLETED").length})
-                </AccordionHeader>
-                <AccordionBody className="pt-4 py-0 text-base font-normal">
-                    {tasks.filter((task: any) => task.taskStatus === "COMPLETED").length?renderTasksByStatus("COMPLETED")
-                    :
-                    
-                    <div>
-                        <p className="text-black text-sm text-center p-3">No Task Completed </p>
-                    </div>
-                    
-                    
-                }
-                </AccordionBody>
-            </Accordion>
+                    <AccordionHeader onClick={() => handleOpen(2)} className={`border-b-0 transition-colors rounded-t-lg px-4 py-2 text-base`} style={{ backgroundColor: "#ceffcc" }}
+                        {...(undefined as any)}>
+                        Completed ({tasks.filter((task: any) => task.taskStatus === "COMPLETED").length})
+                    </AccordionHeader>
+                    <AccordionBody className="pt-4 py-0 text-base font-normal">
+                        {tasks.filter((task: any) => task.taskStatus === "COMPLETED").length ? renderTasksByStatus("COMPLETED")
+                            :
+
+                            <div>
+                                <p className="text-black text-sm text-center p-3">No Task Completed </p>
+                            </div>
+
+
+                        }
+                    </AccordionBody>
+                </Accordion>
             </motion.div>
 
 
-            {selectedTasks.length > 0 && (
-                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white p-4 rounded-lg flex items-center gap-4 shadow-lg">
+            {/* {selectedTasks.length > 0 && (
+                <div className=" fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white p-4 rounded-lg flex items-center gap-4 shadow-lg">
                     <span className="rounded-full border p-2">{selectedTasks.length} Tasks Selected</span>
                     <Menu>
                         <MenuHandler>
@@ -394,7 +423,43 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
                     </Button>
                     
                 </div>
-            )}
+            )} */}
+
+            <div className="relative m-3">
+                {selectedTasks.length > 0 && (
+                    <div className="fixed bottom-2 md:bottom-4 lg:bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white p-3 rounded-lg flex items-center gap-2 shadow-lg w-auto max-w-[80%] md:max-w-[50%] z-50">
+                        <span className="rounded-full border px-3 py-1 text-sm">
+                            {selectedTasks.length} Tasks Selected
+                        </span>
+                        <Menu>
+                            <MenuHandler>
+                                <Button
+                                    {...(undefined as any)} variant="text" className="text-white rounded-full border px-3 py-1 text-sm">
+                                    Status
+                                </Button>
+                            </MenuHandler>
+                            <MenuList
+                                {...(undefined as any)} className="bg-white text-black">
+                                {["TO_DO", "IN_PROGRESS", "COMPLETED"].map((status) => (
+                                    <MenuItem
+                                        {...(undefined as any)} key={status} onClick={() => handleStatusChange(status)}>
+                                        {status.replace("_", " ")}
+                                    </MenuItem>
+                                ))}
+                            </MenuList>
+                        </Menu>
+                        <Button
+                            {...(undefined as any)} color="red" className="rounded-full px-3 py-1 text-sm" onClick={handleBulkDelete}>
+                            Delete
+                        </Button>
+
+                        <Button
+                            {...(undefined as any)} color="blue" className="rounded-full px-3 py-1 text-sm" onClick={handleCancelSeletedTask}>
+                            Cancel
+                        </Button>
+                    </div>
+                )}
+            </div>
 
         </>
     );
