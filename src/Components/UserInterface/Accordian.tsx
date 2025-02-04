@@ -330,7 +330,7 @@ export default function AccordionComponent({ tasks, updateStatus, onEdit, ondele
                                             </Button>
                                         </div>
                                     </>
-                                ) : <Button onClick={handleAddRowTask} color="purple" size="sm" className="w-[80px] bg-white-800 text-blue-800"
+                                ) : <Button onClick={handleAddRowTask} color="purple" size="sm" className="w-[80px] bg-white-800 text-blue-800 hidden md:block"
 
                                     {...(undefined as any)}>
                                     <i className="fa fa-plus "></i>  ADD

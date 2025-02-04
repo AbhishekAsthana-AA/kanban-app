@@ -19,6 +19,7 @@ import {
     Tab,
 } from "@material-tailwind/react";
 
+
 const categories = ["Work", "Personal"];
 
 interface Props {
@@ -35,6 +36,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
     const [imagePreview, setImagePreview] = useState(null);
     const [taskData, setTaskData] = useState<any>({});
     const [selectedTab, setSelectedTab] = useState('details');
+    const [loading ,setLoading] =useState(false);
 
     // Validation Shema
     const validationSchema = Yup.object().shape({
@@ -102,6 +104,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
 
         const file = event.target.files[0];
         if (!file) return;
+        setLoading(true)
         const formData = new FormData()
         formData.append("file", file)
         formData.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET)
@@ -112,7 +115,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
         })
 
         const uploadImageBaseUrl = await res.json()
-        console.log(uploadImageBaseUrl.url);
+        setLoading(false)
         if (uploadImageBaseUrl.url) {
             setTaskData((prev: any) => ({ ...prev, img: uploadImageBaseUrl.url, uploadImgTime: serverTimestamp() }))
             displayImagePreview(file);
@@ -127,16 +130,17 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
         event.preventDefault();
         const file = event.dataTransfer.files[0];
         if (!file) return;
+        setLoading(true)
         const formData = new FormData()
         formData.append("file", file)
         formData.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET)
         formData.append('cloud_name', import.meta.env.VITE_CLOUD_NAME)
-        const res = await fetch('https://api.cloudinary.com/v1_1/dhhr6cbqr/image/upload', {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/image/upload`, {
             method: 'POST',
             body: formData
         })
         const uploadImageBaseUrl = await res.json()
-        console.log(uploadImageBaseUrl.url);
+        setLoading(false)
         if (uploadImageBaseUrl.url) {
             setTaskData((prev: any) => ({ ...prev, img: uploadImageBaseUrl.url, uploadImgTime: serverTimestamp() }))
             displayImagePreview(file);
@@ -412,7 +416,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
                                     </div>
 
                                 </DialogBody>
-                                <DialogFooter    {...(undefined as any)}>
+                                {loading?<div className="mt-2 text-black text-center">Loading Image</div>:<DialogFooter    {...(undefined as any)}>
                                     <Button
                                         variant="text"
                                         color="red"
@@ -437,7 +441,7 @@ export default function AddEditTask({ open, handleToggle, onSave, taskEditData, 
                                     >
                                         Create
                                     </Button>
-                                </DialogFooter>
+                                </DialogFooter>}
                             </form>
                         )
                     }
