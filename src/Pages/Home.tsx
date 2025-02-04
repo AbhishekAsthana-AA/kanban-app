@@ -11,13 +11,13 @@ import AccordionComponent from "../Components/UserInterface/Accordian";
 import Board from "../Components/UserInterface/Board";
 import AddEditTask from "../Components/UserInterface/AddEditTask";
 import { auth, db } from "../Firebase/firebase";
-import { doc, setDoc, serverTimestamp, collection, deleteDoc, getDocs, query, where, orderBy, updateDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection, deleteDoc, getDocs, query, where, updateDoc } from "firebase/firestore";
 import { toast } from 'react-toastify';
 import { useState, useEffect } from "react";
 // import { taskCategories } from "../Utils/data";
 import { Select, Option, Typography, Input } from "@material-tailwind/react"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { startAt, endAt, writeBatch } from "firebase/firestore";
+import { writeBatch } from "firebase/firestore";
 import { useAuth } from "../Hooks/auth";
 import { ToastContainer } from 'react-toastify';
 import DatePicker from "react-datepicker";
@@ -64,9 +64,17 @@ export default function Home() {
 
   };
 
+  // useEffect(() => {
+  //   fetchDocuments();
+  // }, [payload, sortOrder])
+
   useEffect(() => {
-    fetchDocuments();
-  }, [payload, sortOrder])
+    const delayDebounceFn = setTimeout(() => {
+      fetchDocuments();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [payload, sortOrder]);
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -82,11 +90,11 @@ export default function Home() {
       if (payload.taskCategory) {
         filters.push(where("taskCategory", "==", payload.taskCategory));
       }
-      if (payload.taskTitle) {
-        filters.push(orderBy('taskTitle'));
-        filters.push(startAt(payload.taskTitle));
-        filters.push(endAt(payload.taskTitle + '\uf8ff'));
-      }
+      // if (payload.taskTitle) {
+      //   filters.push(orderBy('taskTitle'));
+      //   filters.push(startAt(payload.taskTitle));
+      //   filters.push(endAt(payload.taskTitle + '\uf8ff'));
+      // }
 
       // if (payload.startDate && payload.endDate) {
       //   const startTimestamp = Timestamp.fromDate(new Date(payload.startDate)); // Convert to Date
@@ -144,6 +152,11 @@ export default function Home() {
           }) : '',
         };
       });
+
+      if (payload.taskTitle) {
+        const searchTerm = payload.taskTitle.toLowerCase(); // Convert input to lowercase
+        data = data.filter((task: any) => task.taskTitle.toLowerCase().includes(searchTerm));
+      }
 
       if (payload.startDate && payload.endDate) {
         const startDate = new Date(payload.startDate);
@@ -351,12 +364,12 @@ export default function Home() {
                 <div className="py-4 flex flex-col md:flex-row items-center justify-between gap-4">
 
                   <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                    <Typography variant="paragraph" color="blue-gray" className="font-medium w-48"
+                    <Typography variant="paragraph" color="blue-gray" className="font-medium w-full sm:w-48 text-center sm:text-left"
                       {...(undefined as any)}>
                       Filter by:
                     </Typography>
 
-                    <Select size="md" label="Category" className="overflow-hidden "
+                    <Select size="md" label="Category" className="overflow-hidden"
                       value={payload.taskCategory}
                       onChange={(value) => {
                         handleFilterChange("taskCategory", value);
@@ -378,26 +391,29 @@ export default function Home() {
                       isClearable
                       placeholderText="Select date range"
                       dateFormat="yyyy-MM-dd"
-                      className="border p-2 rounded"
+                      className="border p-2 rounded border-black"
                     />
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <Input type="text" placeholder="Search" className="w-52 pl-10 rounded-full"
-                        value={payload.taskTitle}
-                        onChange={(e) => {
-                          handleFilterChange("taskTitle", e.target.value);
-                        }}
-                        {...(undefined as any)} />
+                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    {/* Search Bar */}
+                    <div className="relative w-full sm:w-52">
+                      <Input
+                        type="text"
+                        placeholder="Search"
+                        className="w-full pl-10 rounded-full"
+                        value={payload.taskTitle}       {...(undefined as any)}
+                        onChange={(e) => handleFilterChange("taskTitle", e.target.value)}
+                      />
                       <MagnifyingGlassIcon className="w-5 h-5 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2" />
                     </div>
 
-                    <Button      {...(undefined as any)}
+                    {/* Add Task Button */}
+                    <Button
                       variant="gradient"
                       onClick={toggleModal}
-                      className="rounded-full"
-                      color="purple"
+                      className="rounded-full w-full sm:w-auto"
+                      color="purple"       {...(undefined as any)}
                     >
                       ADD TASK
                     </Button>
