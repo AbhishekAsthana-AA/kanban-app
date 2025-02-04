@@ -52,7 +52,14 @@ export default function Header() {
 
 
   return (
-    <div className="flex justify-between p-4 transition-colors duration-300 "  style={{ backgroundColor: "#e1c1e4" }}>
+    <div className="flex justify-between p-4 transition-colors duration-300 "  
+    style={{ backgroundColor: "#e1c1e4",
+    position:'fixed',
+    top: 0,
+    left: 0,
+    width: "100%",
+    zIndex: 1000,
+     }}>
       <h1 className="flex text-2xl dark:text-blue font-bold items-center gap-2">
       <i className='fa fa-file' aria-hidden="true"></i> TaskBuddy
       </h1>
