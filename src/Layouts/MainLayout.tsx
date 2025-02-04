@@ -10,7 +10,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div>
       <Helmet>
-        <title>My React App</title>
+        <title></title>
         <meta name="description" content="This is my amazing React app!" />
         <meta name="keywords" content="React, Web Development, JavaScript" />
         <meta name="author" content="Your Name" />
