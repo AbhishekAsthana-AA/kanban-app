@@ -52,9 +52,9 @@ export default function Header() {
 
 
   return (
-    <div className="flex justify-between p-4 transition-colors duration-300 "  
+    <div className="flex justify-between p-4 mb-5 transition-colors duration-300 "  
     style={{ backgroundColor: "#e1c1e4",
-    position:'fixed',
+    // position:'fixed',
     top: 0,
     left: 0,
     width: "100%",
